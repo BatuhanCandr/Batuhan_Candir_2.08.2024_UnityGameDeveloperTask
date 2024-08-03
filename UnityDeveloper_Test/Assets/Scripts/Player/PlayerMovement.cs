@@ -16,9 +16,13 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        MovePlayer();
-        CheckGroundStatus();
-        Jump();
+        if (GameManager.Instance.isStart)
+        {
+            MovePlayer();
+            CheckGroundStatus();
+            Jump();
+        }
+       
     }
 
     void MovePlayer()

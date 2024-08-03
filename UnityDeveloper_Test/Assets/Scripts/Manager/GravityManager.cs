@@ -6,19 +6,21 @@ public class GravityManager : MonoBehaviour
 {
     [SerializeField] internal List<GameObject> holoList;
     [SerializeField] internal float rotationSpeed = 1.0f;
-
-    [Space]
-    [Header("Current Gravity")]
-    public float currentXGravity = 0f;
-    public float currentYGravity = -9.81f;
-    public float currentZGravity = 0f;
+    private bool isUpdatingHoloList = false;
+    [Space] [Header("Current Gravity")] private float currentXGravity = 0f;
+    private float currentYGravity = -9.81f;
+    private float currentZGravity = 0f;
 
     private bool jumpRequested = false;
 
     void Update()
     {
-        ChangeGravity();
-        UpdateHoloList();
+        if (GameManager.Instance.isStart)
+        {
+            ChangeGravity();
+            CheckInputForHoloList();
+        }
+        
     }
 
     private void ChangeGravity()
@@ -46,6 +48,7 @@ public class GravityManager : MonoBehaviour
 
         Physics.gravity = new Vector3(currentXGravity, currentYGravity, currentZGravity);
         UpdateRotation();
+        UpdateHoloList();
     }
 
     private void SetGravity(Vector3 gravityDirection)
@@ -58,17 +61,37 @@ public class GravityManager : MonoBehaviour
     private void UpdateRotation()
     {
         Vector3 gravityUp = -Physics.gravity.normalized;
-        Quaternion targetRotation = Quaternion.FromToRotation(GameManager.Instance.player.transform.up, gravityUp) * GameManager.Instance.player.transform.rotation;
-        GameManager.Instance.player.transform.rotation = Quaternion.Lerp(GameManager.Instance.player.transform.rotation, targetRotation, Time.deltaTime * rotationSpeed);
+        Quaternion targetRotation = Quaternion.FromToRotation(GameManager.Instance.player.transform.up, gravityUp) *
+                                    GameManager.Instance.player.transform.rotation;
+        GameManager.Instance.player.transform.rotation = Quaternion.Lerp(GameManager.Instance.player.transform.rotation,
+            targetRotation, Time.deltaTime * rotationSpeed);
+    }
+
+    private void CheckInputForHoloList()
+    {
+        bool newIsUpdatingHoloList = Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow) ||
+                                     Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow) ||
+                                     Input.GetKeyUp(KeyCode.UpArrow) || Input.GetKeyUp(KeyCode.DownArrow) ||
+                                     Input.GetKeyUp(KeyCode.LeftArrow) || Input.GetKeyUp(KeyCode.RightArrow);
+
+
+      
+        if (newIsUpdatingHoloList != isUpdatingHoloList)
+        {
+            isUpdatingHoloList = newIsUpdatingHoloList;
+            if (isUpdatingHoloList)
+            {
+                UpdateHoloList();
+            }
+        }
     }
 
     private void UpdateHoloList()
     {
-     
-        foreach (var holo in holoList)
-        {
-            holo.SetActive(false);
-        }
+       
+        holoList.ForEach(holo => holo.SetActive(false));
+
+        
         if (Input.GetKey(KeyCode.UpArrow))
         {
             if (holoList.Count > 0)
