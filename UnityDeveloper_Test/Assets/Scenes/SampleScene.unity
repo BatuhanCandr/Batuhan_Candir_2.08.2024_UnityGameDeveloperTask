@@ -3395,6 +3395,9 @@ MonoBehaviour:
   player: {fileID: 2139468156}
   rotationSpeed: 1
   jumpForce: 5
+  currentXGravity: 0
+  currentYGravity: -9.81
+  currentZGravity: 0
 --- !u!4 &930934440
 Transform:
   m_ObjectHideFlags: 0
@@ -7491,19 +7494,18 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2139468153}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c881ff4afa0152a488c1e63e44d4653c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 6
-  rotationSpeed: 10
-  jumpForce: 0.3
-  groundCheckDistance: 0.1
+  rb: {fileID: 2139468158}
+  speed: 5
+  jumpForce: 10
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
-  rb: {fileID: 2139468158}
+  groundCheckDistance: 0.2
 --- !u!54 &2139468158
 Rigidbody:
   m_ObjectHideFlags: 0

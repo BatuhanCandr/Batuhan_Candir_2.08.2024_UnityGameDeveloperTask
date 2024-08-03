@@ -1,84 +1,68 @@
 using System.Collections;
 using UnityEngine;
+using DG.Tweening; // DoTween kütüphanesi için
 
 public class GravityManager : MonoBehaviour
 {
     public Transform player; // Player objenizi buraya atayın
     public float rotationSpeed = 1.0f; // Döndürme hızı
     public float jumpForce = 5.0f; // Zıplama kuvveti
+    
+    public float currentXGravity = 0f;
+    public float currentYGravity = -9.81f;
+    public float currentZGravity = 0f;
 
-    private Vector3 currentGravity;
-
-    void Start()
-    {
-        // Başlangıç yerçekimi ayarı
-        currentGravity = new Vector3(0f, -9.81f, 0f);
-        Physics.gravity = currentGravity;
-    }
+    private bool jumpRequested = false;
 
     void Update()
     {
-        // Yön tuşlarına basıldığında gravity ve rotasyon değişikliği yap
         if (Input.GetKeyDown(KeyCode.UpArrow))
         {
-            SetGravityAndRotation(player.transform.forward);
+            var forwardDirection = RoundVector3Position(player.transform.forward);
+            SetGravity(forwardDirection);
         }
-
-        if (Input.GetKeyDown(KeyCode.DownArrow))
+        else if (Input.GetKeyDown(KeyCode.DownArrow))
         {
-            SetGravityAndRotation(-player.transform.forward);
+            var backDirection = RoundVector3Position(-player.transform.forward);
+            SetGravity(backDirection);
         }
-
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
+        else if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            SetGravityAndRotation(-player.transform.right);
+            var leftDirection = RoundVector3Position(-player.transform.right);
+            SetGravity(leftDirection);
         }
-
-        if (Input.GetKeyDown(KeyCode.RightArrow))
+        else if (Input.GetKeyDown(KeyCode.RightArrow))
         {
-            SetGravityAndRotation(player.transform.right);
+            var rightDirection = RoundVector3Position(player.transform.right);
+            SetGravity(rightDirection);
         }
 
-        // Güncellenmiş gravity değerini fizik motoruna ilet
-        Physics.gravity = currentGravity;
-    }
-
-    private void SetGravityAndRotation(Vector3 direction)
-    {
-        // Yönü yuvarlama
-        Vector3 roundedDirection = RoundVector3(direction);
-
-        // Gravity ayarla
-        SetGravity(roundedDirection);
-
-        // Rotasyonu güncelle
+        Physics.gravity = new Vector3(currentXGravity, currentYGravity, currentZGravity);
         UpdateRotation();
-    }
-
-    private Vector3 RoundVector3(Vector3 vector)
-    {
-        return new Vector3(
-            Mathf.Round(vector.x),
-            Mathf.Round(vector.y),
-            Mathf.Round(vector.z)
-        );
     }
 
     private void SetGravity(Vector3 gravityDirection)
     {
-        currentGravity = 9.81f * gravityDirection;
+        currentXGravity = 9.81f * gravityDirection.x;
+        currentYGravity = 9.81f * gravityDirection.y;
+        currentZGravity = 9.81f * gravityDirection.z;
     }
 
     private void UpdateRotation()
     {
-        // Yerçekimi yönünün tersine bakacak yukarı yönünü hesapla
-        Vector3 upDirection = -currentGravity.normalized;
-
-        // İleri yönü (forward) mevcut bakış yönüne (camera veya player yönü) göre ayarla
-        Vector3 forwardDirection = Vector3.Cross(player.right, upDirection).normalized;
-
-        // Rotasyonu ayarla
-        Quaternion targetRotation = Quaternion.LookRotation(forwardDirection, upDirection);
-        player.rotation = targetRotation;
+        Vector3 gravityUp = -Physics.gravity.normalized;
+        Quaternion targetRotation = Quaternion.FromToRotation(player.up, gravityUp) * player.rotation;
+        player.rotation = Quaternion.Lerp(player.rotation, targetRotation, Time.deltaTime * rotationSpeed);
     }
+
+    Vector3 RoundVector3Position(Vector3 position)
+    {
+        return new Vector3(
+            Mathf.Round(position.x),
+            Mathf.Round(position.y),
+            Mathf.Round(position.z)
+        );
+    }
+
+    
 }
