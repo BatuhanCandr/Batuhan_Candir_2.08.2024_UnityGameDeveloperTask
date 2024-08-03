@@ -15,7 +15,7 @@ public class GravityManager : MonoBehaviour
 
     void Update()
     {
-        if (GameManager.Instance.isStart)
+        if (GameManager.Instance.isStart && !GameManager.Instance.isFail)
         {
             ChangeGravity();
             CheckInputForHoloList();

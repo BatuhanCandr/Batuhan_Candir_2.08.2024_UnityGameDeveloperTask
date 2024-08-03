@@ -8,26 +8,26 @@ public class PlayerMovement : MonoBehaviour
     public float jumpForce = 10.0f;
     public LayerMask groundLayer;
     public float groundCheckDistance;
-    public float rotationSpeed ;
-    public float movementThreshold; 
+    public float rotationSpeed;
+    public float movementThreshold;
 
     private bool isGrounded;
     private bool isWalking;
+    private float timeSinceGrounded;
 
     void Update()
     {
-        if (GameManager.Instance.isStart)
+        if (GameManager.Instance.isStart && !GameManager.Instance.isFail)
         {
             MovePlayer();
             CheckGroundStatus();
             Jump();
+            CheckIfGroundedForLong();
         }
-       
     }
 
     void MovePlayer()
     {
-        
         Vector3 gravityDirection = Physics.gravity.normalized;
         Vector3 right = Vector3.Cross(gravityDirection, transform.forward);
         Vector3 forward = Vector3.Cross(right, gravityDirection);
@@ -37,14 +37,12 @@ public class PlayerMovement : MonoBehaviour
 
         Vector3 movement = (right * -moveHorizontal + forward * moveVertical).normalized * (speed * Time.deltaTime);
 
-       
-       CheckIfWalking(movement);
+        CheckIfWalking(movement);
 
         transform.position += movement;
 
         UpdateChildRotation(movement, gravityDirection);
 
-      
         transform.rotation = Quaternion.FromToRotation(transform.up, -gravityDirection) * transform.rotation;
     }
 
@@ -84,5 +82,23 @@ public class PlayerMovement : MonoBehaviour
         {
             GameManager.Instance.player.playerAnimationController.PlayerIdleAnim();
         }
+    }
+
+    void CheckIfGroundedForLong()
+    {
+        if (!isGrounded)
+        {
+            timeSinceGrounded += Time.deltaTime;
+            if (timeSinceGrounded >= 4.0f)
+            {
+               GameManager.Instance.Fail();
+               GameManager.Instance.uiManager.failInfo.text = "You Fall For Too Long";
+            }
+        }
+        else
+        {
+            timeSinceGrounded = 0f;
+        }
+        GameManager.Instance.RestartScene();
     }
 }
