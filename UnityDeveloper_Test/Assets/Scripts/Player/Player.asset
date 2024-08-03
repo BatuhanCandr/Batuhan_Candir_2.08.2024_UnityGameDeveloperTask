@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 5
   jumpForce: 40
-  rotationSpeed: 20
+  rotationSpeed: 5
   movementThreshold: 0

@@ -3,11 +3,10 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private Rigidbody rb;
-    [SerializeField] private Transform childTransform;
-  
+    [SerializeField] internal Transform childTransform;
+
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private float groundCheckDistance;
-  
 
     private bool isGrounded;
     private bool isWalking;
@@ -26,22 +25,31 @@ public class PlayerMovement : MonoBehaviour
 
     void MovePlayer()
     {
+        
         Vector3 gravityDirection = Physics.gravity.normalized;
+        
         Vector3 right = Vector3.Cross(gravityDirection, transform.forward);
         Vector3 forward = Vector3.Cross(right, gravityDirection);
 
+        // Get input
         float moveHorizontal = Input.GetAxis("Horizontal");
         float moveVertical = Input.GetAxis("Vertical");
 
-        Vector3 movement = (right * -moveHorizontal + forward * moveVertical).normalized * (GameManager.Instance.player.playerData.speed * Time.deltaTime);
+       
+        Vector3 movementDirection = (forward * moveVertical + right * -moveHorizontal).normalized;
+        Vector3 movement = movementDirection * (GameManager.Instance.player.playerData.speed * Time.deltaTime);
 
         CheckIfWalking(movement);
 
-        transform.position += movement;
+       
+        rb.MovePosition(rb.position + movement);
 
+     
         UpdateChildRotation(movement, gravityDirection);
 
-        transform.rotation = Quaternion.FromToRotation(transform.up, -gravityDirection) * transform.rotation;
+       
+        Quaternion targetRotation = Quaternion.FromToRotation(transform.up, -gravityDirection) * transform.rotation;
+        rb.MoveRotation(targetRotation);
     }
 
     void Jump()

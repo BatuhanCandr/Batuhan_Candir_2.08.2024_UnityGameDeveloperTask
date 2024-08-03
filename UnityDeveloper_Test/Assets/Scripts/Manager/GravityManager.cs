@@ -27,22 +27,22 @@ public class GravityManager : MonoBehaviour
     {
         if (Input.GetKeyUp(KeyCode.UpArrow))
         {
-            var forwardDirection = RoundVector3Position(GameManager.Instance.player.transform.forward);
+            var forwardDirection = RoundVector3Position(GameManager.Instance.player.playerMovement.childTransform.forward);
             SetGravity(forwardDirection);
         }
         else if (Input.GetKeyUp(KeyCode.DownArrow))
         {
-            var backDirection = RoundVector3Position(-GameManager.Instance.player.transform.forward);
+            var backDirection = RoundVector3Position(-GameManager.Instance.player.playerMovement.childTransform.forward);
             SetGravity(backDirection);
         }
         else if (Input.GetKeyUp(KeyCode.LeftArrow))
         {
-            var leftDirection = RoundVector3Position(-GameManager.Instance.player.transform.right);
+            var leftDirection = RoundVector3Position(-GameManager.Instance.player.playerMovement.childTransform.right);
             SetGravity(leftDirection);
         }
         else if (Input.GetKeyUp(KeyCode.RightArrow))
         {
-            var rightDirection = RoundVector3Position(GameManager.Instance.player.transform.right);
+            var rightDirection = RoundVector3Position(GameManager.Instance.player.playerMovement.childTransform.right);
             SetGravity(rightDirection);
         }
 
