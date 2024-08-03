@@ -4,12 +4,10 @@ public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private Rigidbody rb;
     [SerializeField] private Transform childTransform;
-    public float speed = 5.0f;
-    public float jumpForce = 10.0f;
-    public LayerMask groundLayer;
-    public float groundCheckDistance;
-    public float rotationSpeed;
-    public float movementThreshold;
+  
+    [SerializeField] private LayerMask groundLayer;
+    [SerializeField] private float groundCheckDistance;
+  
 
     private bool isGrounded;
     private bool isWalking;
@@ -35,7 +33,7 @@ public class PlayerMovement : MonoBehaviour
         float moveHorizontal = Input.GetAxis("Horizontal");
         float moveVertical = Input.GetAxis("Vertical");
 
-        Vector3 movement = (right * -moveHorizontal + forward * moveVertical).normalized * (speed * Time.deltaTime);
+        Vector3 movement = (right * -moveHorizontal + forward * moveVertical).normalized * (GameManager.Instance.player.playerData.speed * Time.deltaTime);
 
         CheckIfWalking(movement);
 
@@ -51,7 +49,7 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
             Vector3 jumpDirection = -Physics.gravity.normalized;
-            rb.AddForce(jumpDirection * jumpForce, ForceMode.Impulse);
+            rb.AddForce(jumpDirection * GameManager.Instance.player.playerData.jumpForce, ForceMode.Impulse);
         }
     }
 
@@ -67,13 +65,13 @@ public class PlayerMovement : MonoBehaviour
         if (movement != Vector3.zero && childTransform != null)
         {
             Quaternion targetRotation = Quaternion.LookRotation(movement, -gravityDirection);
-            childTransform.rotation = Quaternion.Slerp(childTransform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+            childTransform.rotation = Quaternion.Slerp(childTransform.rotation, targetRotation, GameManager.Instance.player.playerData.rotationSpeed * Time.deltaTime);
         }
     }
 
     void CheckIfWalking(Vector3 movement)
     {
-        isWalking = movement.magnitude > movementThreshold;
+        isWalking = movement.magnitude > GameManager.Instance.player.playerData.movementThreshold;
         if (isWalking)
         {
             GameManager.Instance.player.playerAnimationController.PlayerRunAnim();

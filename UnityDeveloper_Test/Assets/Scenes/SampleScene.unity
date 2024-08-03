@@ -17871,7 +17871,7 @@ MonoBehaviour:
   m_XAxis:
     Value: 0
     m_SpeedMode: 0
-    m_MaxSpeed: 300
+    m_MaxSpeed: 350
     m_AccelTime: 0.1
     m_DecelTime: 0.1
     m_InputAxisName: Mouse X
@@ -25108,6 +25108,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8b30016df8cfb740a9f632f145eba3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerData: {fileID: 11400000, guid: 0dc46c61e8768334c8c8d477b34c375c, type: 2}
   playerMovement: {fileID: 2139468157}
   playerAnimationController: {fileID: 2139468155}
 --- !u!114 &2139468155
@@ -25153,14 +25154,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rb: {fileID: 2139468158}
   childTransform: {fileID: 543450653259175915}
-  speed: 5
-  jumpForce: 40
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
   groundCheckDistance: 0.2
-  rotationSpeed: 10
-  movementThreshold: 0
 --- !u!54 &2139468158
 Rigidbody:
   m_ObjectHideFlags: 0
