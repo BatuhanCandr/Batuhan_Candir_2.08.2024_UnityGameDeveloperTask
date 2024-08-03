@@ -2,27 +2,21 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    
-    
-    [SerializeField]  private Rigidbody rb;
+    [SerializeField] private Rigidbody rb;
+    [SerializeField] private Transform childTransform; // Çocuğun referansı
     public float speed = 5.0f;
-    public float jumpForce = 10.0f; 
-    public LayerMask groundLayer; 
-    public float groundCheckDistance; 
+    public float jumpForce = 10.0f;
+    public LayerMask groundLayer;
+    public float groundCheckDistance = 1.1f; // Varsayılan değer, ihtiyaca göre ayarlayın
+    public float rotationSpeed = 5.0f; // Çocuğun dönüş hızı
 
-  
     private bool isGrounded;
-
-    
 
     void Update()
     {
         MovePlayer();
         CheckGroundStatus();
-        if (Input.GetButtonDown("Jump") && isGrounded)
-        {
-            Jump();
-        }
+        Jump();
     }
 
     void MovePlayer()
@@ -34,32 +28,42 @@ public class PlayerMovement : MonoBehaviour
         float moveHorizontal = Input.GetAxis("Horizontal");
         float moveVertical = Input.GetAxis("Vertical");
 
+        // Hareket yönünü hesapla
         Vector3 movement = (right * -moveHorizontal + forward * moveVertical).normalized * (speed * Time.deltaTime);
 
-      
+        // Yeni pozisyonu uygula
         transform.position += movement;
 
-      
-        Vector3 newUp = -gravityDirection;
-        transform.rotation = Quaternion.FromToRotation(transform.up, newUp) * transform.rotation;
+        // Çocuğun yönünü güncelle
+      //  UpdateChildRotation(movement, gravityDirection);
+
+        // Oyuncunun bakış yönünü yerçekimi yönüne dik olacak şekilde ayarla
+        transform.rotation = Quaternion.FromToRotation(transform.up, -gravityDirection) * transform.rotation;
     }
 
     void Jump()
     {
-        Vector3 jumpDirection = -Physics.gravity.normalized;
-        rb.AddForce(jumpDirection * jumpForce, ForceMode.Impulse);
+        if (Input.GetButtonDown("Jump") && isGrounded)
+        {
+            Vector3 jumpDirection = -Physics.gravity.normalized;
+            rb.AddForce(jumpDirection * jumpForce, ForceMode.Impulse);
+        }
     }
 
     void CheckGroundStatus()
     {
-        
         Vector3 raycastDirection = Physics.gravity.normalized;
-        RaycastHit hit;
-        isGrounded = Physics.Raycast(transform.position, raycastDirection, out hit, groundCheckDistance, groundLayer);
-        
-        if (!isGrounded)
+        // Yere temas olup olmadığını kontrol et
+        isGrounded = Physics.Raycast(transform.position, raycastDirection, groundCheckDistance, groundLayer) ||
+                     Physics.Raycast(transform.position + raycastDirection * 0.1f, raycastDirection, groundCheckDistance, groundLayer);
+    }
+
+    void UpdateChildRotation(Vector3 movement, Vector3 gravityDirection)
+    {
+        if (movement != Vector3.zero && childTransform != null)
         {
-            isGrounded = Physics.Raycast(transform.position + raycastDirection * 0.1f, raycastDirection, out hit, groundCheckDistance, groundLayer);
+            Quaternion targetRotation = Quaternion.LookRotation(movement, -gravityDirection);
+            childTransform.rotation = Quaternion.Slerp(childTransform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
         }
     }
 }
